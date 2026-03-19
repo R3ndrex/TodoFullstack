@@ -31,7 +31,7 @@ export default {
         const { name, password, email } = req.body;
         if (!name || !password || !email)
             return res.status(400).json({
-                message: "Username and password and email are required",
+                message: "Name and password and email are required",
             });
 
         const user = await prisma.user.findUnique({ where: { email } });
@@ -92,5 +92,48 @@ export default {
         res.clearCookie("accessToken");
         res.clearCookie("refreshToken");
         return res.status(200).json({ message: "Logged out" });
+    },
+    refresh: async (req: Request, res: Response) => {
+        if (!ACCESS_SECRET || !REFRESH_SECRET) {
+            throw new Error("Token secrets are not defined");
+        }
+
+        const token = req.cookies?.refreshToken;
+        if (!token) {
+            return res.status(401).json({ message: "No refresh token" });
+        }
+
+        try {
+            const payload = jwt.verify(token, REFRESH_SECRET) as {
+                userId: number;
+            };
+
+            const user = await prisma.user.findUnique({
+                where: { id: payload.userId },
+            });
+            if (!user) {
+                return res.status(401).json({ message: "User not found" });
+            }
+
+            const accessToken = jwt.sign({ userId: user.id }, ACCESS_SECRET, {
+                expiresIn: "15m",
+            });
+            const refreshToken = jwt.sign({ userId: user.id }, REFRESH_SECRET, {
+                expiresIn: "7d",
+            });
+
+            setTokenCookies(res, accessToken, refreshToken);
+
+            return res.status(200).json({
+                accessToken,
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            });
+        } catch {
+            return res
+                .status(401)
+                .json({ message: "Invalid or expired refresh token" });
+        }
     },
 };
