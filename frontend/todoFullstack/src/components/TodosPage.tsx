@@ -25,6 +25,7 @@ export default function TodosPage() {
 
     return (
         <div className="todos-page">
+            <h1>Your Todos</h1>
             <div>
                 <button onClick={() => setShowModal(true)}>New Todo</button>
                 <button onClick={handleLogout}>LogOut</button>
