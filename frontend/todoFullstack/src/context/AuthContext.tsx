@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import * as authApi from "../lib/auth.ts";
-
+import axios from "axios";
+import { setAccessToken } from "../lib/index";
 type User = { id: number; name: string; email: string } | null;
 
 interface AuthContextType {
@@ -20,7 +21,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const loadUser = async () => {
             try {
-                const data = await authApi.refresh();
+                const { data } = await axios.post(
+                    "http://localhost:3000/api/auth/refresh",
+                    {},
+                    { withCredentials: true },
+                );
+                setAccessToken(data.accessToken);
                 setUser(data);
             } catch {
                 setUser(null);
