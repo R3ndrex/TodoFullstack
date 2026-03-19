@@ -26,17 +26,18 @@ const setTokenCookies = (
 export default {
     login: async (req: Request, res: Response) => {
         const { username, password, email } = req.body;
-        if (!username || password || !email)
+        if (!username || !password || !email)
             return res.status(400).json({
                 message: "Username and password and email are required",
             });
     },
     register: async (req: Request, res: Response) => {
+        console.log(1);
         if (!ACCESS_SECRET || !REFRESH_SECRET) {
             throw new Error("Access token secret is not defined");
         }
         const { name, password, email } = req.body;
-        if (!name || password || !email)
+        if (!name || !password || !email)
             return res.status(400).json({
                 message: "Username and password and email are required",
             });
