@@ -36,9 +36,18 @@ body {
     background-color: rgb(235, 118, 118);
     border: 1px solid black;
     padding: 1rem;
+    p {
+        padding: 1rem;
+    }
 }
 .todo-card.done {
     background-color: rgb(162, 230, 162);
+}
+.todo-card.edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 .modal form {
     display: flex;
