@@ -7,7 +7,7 @@ export default function CreateTodoModal({ onClose }: { onClose: () => void }) {
     const [content, setContent] = useState("");
     const queryClient = useQueryClient();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         await createTodo({ title, content });
         queryClient.invalidateQueries({ queryKey: ["todos"] });
