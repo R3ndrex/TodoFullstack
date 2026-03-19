@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 export default function AuthPage() {
     const navigate = useNavigate();
     const { login, register } = useAuth();
@@ -8,39 +10,23 @@ export default function AuthPage() {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [isRegister, setIsRegister] = useState(false);
-    const { user, isLoading } = useAuth();
-    const [error, setError] = useState("");
 
-    useEffect(() => {
-        if (!isLoading && user) {
-            navigate("/", { replace: true });
-        }
-    }, [user, isLoading, navigate]);
-
-    if (isLoading) return null;
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        try {
-            if (isRegister) {
-                await register(name, email, password);
-            } else {
-                await login(name, email, password);
-            }
-            navigate("/");
-        } catch (err: any) {
-            setError(
-                err.response?.data?.message ||
-                    err.message ||
-                    "Something went wrong",
-            );
-        }
-    };
+    const mutation = useMutation({
+        mutationFn: () =>
+            isRegister
+                ? register(name, email, password)
+                : login(name, email, password),
+        onSuccess: () => navigate("/"),
+    });
 
     return (
         <div className="auth-page">
-            <form onSubmit={handleSubmit}>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    mutation.mutate();
+                }}
+            >
                 <h2>{isRegister ? "Register" : "Login"}</h2>
                 <input
                     placeholder="Name"
@@ -58,12 +44,26 @@ export default function AuthPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <button type="submit">
-                    {isRegister ? "Register" : "Login"}
+                {mutation.isError && (
+                    <div className="error">
+                        {mutation.error?.response?.data?.message ||
+                            "Something went wrong"}
+                    </div>
+                )}
+                <button type="submit" disabled={mutation.isPending}>
+                    {mutation.isPending
+                        ? "Please wait…"
+                        : isRegister
+                          ? "Register"
+                          : "Login"}
                 </button>
             </form>
-            {error && <div className="error">{error}</div>}
-            <button onClick={() => setIsRegister(!isRegister)}>
+            <button
+                onClick={() => {
+                    setIsRegister(!isRegister);
+                    mutation.reset();
+                }}
+            >
                 {isRegister ? "Already have an account?" : "Create account"}
             </button>
         </div>
