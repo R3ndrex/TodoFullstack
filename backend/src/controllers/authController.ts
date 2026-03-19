@@ -32,17 +32,16 @@ export default {
             });
     },
     register: async (req: Request, res: Response) => {
-        console.log(1);
         if (!ACCESS_SECRET || !REFRESH_SECRET) {
             throw new Error("Access token secret is not defined");
         }
         const { name, password, email } = req.body;
-        if (!name || !password || !email)
+        if (!name || !password || !email) {
             return res.status(400).json({
                 message: "Username and password and email are required",
             });
-
-        const existingUser = await prisma.user.findMany();
+        }
+        const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
             return res.status(409).json({ message: "Email is already in use" });
         }
@@ -65,7 +64,8 @@ export default {
             .json({ id: user.id, name: user.name, email: user.email });
     },
     logout: (_req: Request, res: Response) => {
-        res.clearCookie("token");
+        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken");
         return res.status(200).json({ message: "Logged out" });
     },
 };
