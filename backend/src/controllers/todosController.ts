@@ -46,5 +46,31 @@ export default {
 
         return res.status(201).json(todo);
     },
-    updateTodo: async (req: Request, res: Response) => {},
+    updateTodo: async (req: Request, res: Response) => {
+        const userId = req.userId;
+        const { id, title, content, done } = req.body;
+
+        if (!id)
+            return res.status(400).json({ message: "Todo id is required" });
+
+        const todo = await prisma.todo.findUnique({
+            where: { id: Number(id) },
+        });
+
+        if (!todo) return res.status(404).json({ message: "Todo not found" });
+
+        if (todo.userId !== userId)
+            return res.status(403).json({ message: "Forbidden" });
+
+        const updated = await prisma.todo.update({
+            where: { id: Number(id) },
+            data: {
+                ...(title !== undefined && { title }),
+                ...(content !== undefined && { content }),
+                ...(done !== undefined && { done }),
+            },
+        });
+
+        return res.status(200).json(updated);
+    },
 };
