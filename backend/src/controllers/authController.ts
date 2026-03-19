@@ -46,9 +46,9 @@ export default {
         if (existingUser) {
             return res.status(409).json({ message: "Email is already in use" });
         }
-        const hashedPassword = bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
-            data: { name, email, password },
+            data: { name, email, password: hashedPassword },
         });
 
         const accessToken = jwt.sign({ userId: user.id }, ACCESS_SECRET, {
