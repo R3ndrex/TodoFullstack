@@ -9,6 +9,7 @@ export default function AuthPage() {
     const [name, setName] = useState("");
     const [isRegister, setIsRegister] = useState(false);
     const { user, isLoading } = useAuth();
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -20,6 +21,7 @@ export default function AuthPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError("");
         try {
             if (isRegister) {
                 await register(name, email, password);
@@ -28,7 +30,11 @@ export default function AuthPage() {
             }
             navigate("/");
         } catch (err: any) {
-            alert("Error: " + (err.response?.data?.message || err.message));
+            setError(
+                err.response?.data?.message ||
+                    err.message ||
+                    "Something went wrong",
+            );
         }
     };
 
@@ -56,6 +62,7 @@ export default function AuthPage() {
                     {isRegister ? "Register" : "Login"}
                 </button>
             </form>
+            {error && <div className="error">{error}</div>}
             <button onClick={() => setIsRegister(!isRegister)}>
                 {isRegister ? "Already have an account?" : "Create account"}
             </button>
