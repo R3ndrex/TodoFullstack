@@ -17,6 +17,7 @@ export default function CreateTodoModal({ onClose }: { onClose: () => void }) {
     return (
         <div className="modal">
             <form onSubmit={handleSubmit}>
+                <h2>Create Todo</h2>
                 <input
                     placeholder="Title"
                     value={title}
@@ -27,10 +28,12 @@ export default function CreateTodoModal({ onClose }: { onClose: () => void }) {
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                 />
-                <button type="submit">Create</button>
-                <button type="button" onClick={onClose}>
-                    Cancel
-                </button>
+                <div className="button-container">
+                    <button type="submit">Create</button>
+                    <button type="button" onClick={onClose}>
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     );
