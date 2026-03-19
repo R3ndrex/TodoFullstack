@@ -2,8 +2,8 @@ import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
-import authRouter from "./routes/auth.js";
-import todoRouter from "./routes/todos.js";
+import authRouter from "./routes/authRoute.js";
+import todoRouter from "./routes/todosRoute.js";
 
 dotenv.config();
 
