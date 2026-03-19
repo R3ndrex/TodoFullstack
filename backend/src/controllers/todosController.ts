@@ -33,6 +33,18 @@ export default {
         const todos = await prisma.todo.findMany({ where: filter });
         return res.status(200).json(todos);
     },
-    createTodo: async (req: Request, res: Response) => {},
+    createTodo: async (req: Request, res: Response) => {
+        const userId = req.userId;
+        const { title, content } = req.body;
+
+        if (!title)
+            return res.status(400).json({ message: "Title is required" });
+        if (!userId) return res.status(401).json({ message: "Unauthorized" });
+        const todo = await prisma.todo.create({
+            data: { title, content, userId },
+        });
+
+        return res.status(201).json(todo);
+    },
     updateTodo: async (req: Request, res: Response) => {},
 };
