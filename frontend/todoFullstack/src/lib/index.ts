@@ -29,8 +29,13 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const original: RetryableRequestConfig = error.config;
+        const isRefreshCall = original.url?.includes("/auth/refresh");
 
-        if (error.response?.status === 401 && !original._retry) {
+        if (
+            error.response?.status === 401 &&
+            !original._retry &&
+            !isRefreshCall
+        ) {
             original._retry = true;
             try {
                 const { data } = await axios.post<RefreshResponse>(
@@ -46,11 +51,10 @@ api.interceptors.response.use(
                 return api(original);
             } catch {
                 setAccessToken(null);
-                window.location.href = "/login";
+                window.location.href = "/auth";
             }
         }
         return Promise.reject(error);
     },
 );
-
 export default api;
