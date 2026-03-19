@@ -18,15 +18,9 @@ export default function TodoItem({
 }: TodoCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [newTitle, setNewTitle] = useState(title);
-
+    const [newContent, setNewContent] = useState(content ?? "");
     const handleToggle = async () => {
         await updateTodo({ id, done: !done });
-        onUpdate();
-    };
-
-    const handleSave = async () => {
-        await updateTodo({ id, title: newTitle });
-        setIsEditing(false);
         onUpdate();
     };
 
@@ -35,15 +29,32 @@ export default function TodoItem({
         onUpdate();
     };
 
+    const handleSave = async () => {
+        await updateTodo({ id, title: newTitle, content: newContent });
+        setIsEditing(false);
+        onUpdate();
+    };
+
     return (
-        <div className={`todo-card ${done ? "done" : ""}`}>
+        <div
+            className={`todo-card ${done ? "done" : ""} ${isEditing ? "edit" : ""}`}
+        >
             {isEditing ? (
                 <>
                     <input
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
                     />
-                    <button onClick={handleSave}>Save</button>
+                    <textarea
+                        value={newContent}
+                        onChange={(e) => setNewContent(e.target.value)}
+                    />
+                    <div className="button-container">
+                        <button onClick={handleSave}>Save</button>
+                        <button onClick={() => setIsEditing(false)}>
+                            Cancel
+                        </button>
+                    </div>
                 </>
             ) : (
                 <>
