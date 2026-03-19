@@ -12,7 +12,7 @@ function auth(req: Request, res: Response, next: NextFunction) {
 
     try {
         const payload = jwt.verify(token, ACCESS_SECRET) as { userId: number };
-        (req as any).userId = payload.userId;
+        req.userId = payload.userId;
         next();
     } catch {
         return res
