@@ -32,6 +32,9 @@ body {
         align-self: center;
     }
 }
+.error {
+    color: red;
+}
 .todo-card {
     background-color: rgb(235, 118, 118);
     border: 1px solid black;
