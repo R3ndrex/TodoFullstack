@@ -1,14 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 export default function AuthPage() {
     const navigate = useNavigate();
-
     const { login, register } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [isRegister, setIsRegister] = useState(false);
+    const { user, isLoading } = useAuth();
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            navigate("/", { replace: true });
+        }
+    }, [user, isLoading, navigate]);
+
+    if (isLoading) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,6 +35,7 @@ export default function AuthPage() {
     return (
         <div className="auth-page">
             <form onSubmit={handleSubmit}>
+                <h2>{isRegister ? "Register" : "Login"}</h2>
                 <input
                     placeholder="Name"
                     value={name}
